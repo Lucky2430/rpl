@@ -1,0 +1,8 @@
+{
+    "Article": true,
+    "Tag": true,
+    "Comment": true,
+    "Gudang": true,
+    "Transaksi": true,
+    "Barang": true
+}

@@ -1,0 +1,13 @@
+{
+    "name": "Gudang",
+    "alias": "gudang",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Gudang\\Providers\\GudangServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
