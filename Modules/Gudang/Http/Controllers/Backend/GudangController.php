@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Gudang\Entities\Gudang;
+use App\Exports\GudangExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GudangController extends BackendBaseController
 {
@@ -138,6 +140,11 @@ class GudangController extends BackendBaseController
         flash(icon()." {$module_title} berhasil dihapus")->success()->important();
 
         return redirect()->route("backend.gudang.index");
+    }
+
+    public function exportCsv()
+    {
+        return Excel::download(new GudangExport, 'gudang-' . date('Y-m-d') . '.csv');
     }
 
     // Method lain yang tidak dipakai (show, trashed, dll) biarkan tetap atau hapus kalau mau

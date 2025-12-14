@@ -15,15 +15,12 @@ class CreateTransaksiDetailsTable extends Migration
     {
         Schema::create('transaksi_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade');
+            $table->foreignId('transaksi_id')->constrained()->onDelete('cascade');
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
-            $table->foreignId('gudang_id')->constrained('gudangs')->onDelete('cascade');
             $table->integer('jumlah');
-            $table->decimal('harga_satuan', 12, 2)->default(0); // optional, kalau butuh harga
-            // Biar 1 barang cuma 1x di 1 transaksi
-            $table->unique(['transaksi_id', 'barang_id', 'gudang_id']);
             $table->timestamps();
-            $table->softdeletes();
+
+            $table->unique(['transaksi_id', 'barang_id']); // 1 barang cuma 1x per transaksi
         });
     }
 

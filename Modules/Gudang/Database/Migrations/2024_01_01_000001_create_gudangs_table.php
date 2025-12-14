@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateGudangsTable extends Migration
 {
@@ -15,13 +15,15 @@ class CreateGudangsTable extends Migration
             $table->string('lokasi')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->softdeletes();
+            $table->softDeletes();
+
+            $table->index('kode_gudang');
+            $table->index('nama_gudang');
         });
     }
 
     public function down()
     {
         Schema::dropIfExists('gudangs');
-        // $table-dropsoftDeletes();
     }
 }

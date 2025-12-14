@@ -1,5 +1,11 @@
 @extends('backend.layouts.app')
 
+@php
+    $module_action = $module_action ?? 'Daftar';
+    $module_title  = $module_title  ?? 'Transaksi';
+    $module_icon   = $module_icon   ?? 'cil-list';
+@endphp
+
 @section('title') {{ $module_action }} {{ $module_title }} @endsection
 
 @section('breadcrumbs')
@@ -40,14 +46,13 @@
                             <th>Tanggal</th>
                             <th>Jenis</th>
                             <th>Barang</th>
-                            <th>Gudang</th>
-                            <th>Jumlah</th>
+                            <th>Lokasi Gudang</th>
+                            <th>Jumlah Item</th>
                             <th>Keterangan</th>
                             <th>Dibuat Oleh</th>
                             <th width="10%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -73,62 +78,77 @@ $(function () {
     $('#datatable').DataTable({
         processing: true,
         serverSide: true,
-        autoWidth: false,
-        responsive: true,
         ajax: '{{ route("backend.transaksi.datatable") }}',
         columns: [
-            { data: 'id', name: 'id', width: '5%', className: 'text-center' },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, width: '5%' },
             { data: 'kode_transaksi', name: 'kode_transaksi' },
             { 
                 data: 'tanggal', 
-                name: 'tanggal',
-                render: function(data) {
-                    return moment(data).format('DD/MM/YYYY');
-                }
+                render: data => new Date(data).toLocaleDateString('id-ID', { 
+                    day: '2-digit', month: '2-digit', year: 'numeric' 
+                })
             },
             { 
-                data: 'jenis', 
-                name: 'jenis',
-                render: function(data) {
-                    return data === 'masuk' 
-                        ? '<span class="badge badge-success">MASUK</span>' 
-                        : '<span class="badge badge-danger">KELUAR</span>';
-                }
+                data: 'jenis',
+                render: data => data === 'masuk' 
+                    ? '<span class="badge badge-success fw-bold">MASUK</span>' 
+                    : '<span class="badge badge-danger fw-bold">KELUAR</span>'
             },
-            { data: 'barang.nama_barang', name: 'barang.nama_barang', defaultContent: '-' },
-            { data: 'gudang.nama_gudang', name: 'gudang.nama_gudang', defaultContent: '-' },
             { 
-                data: 'jumlah', 
-                name: 'jumlah',
-                className: 'text-right',
+                data: 'details', 
                 render: function(data) {
-                    return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                }
+                    if (!data || data.length === 0) return '<em class="text-muted">Tidak ada barang</em>';
+                    return data.map(d => 
+                        d.barang?.nama_barang || '<em class="text-muted">Barang dihapus</em>'
+                    ).join('<br>');
+                },
+                orderable: false
+            },
+            { 
+                data: 'details', 
+                render: function(data) {
+                    if (!data || data.length === 0) return '-';
+                    return data.map(d => 
+                        d.barang?.gudang?.nama_gudang || '<em class="text-muted">Gudang dihapus</em>'
+                    ).join('<br>');
+                },
+                orderable: false
+            },
+            { 
+                data: 'details',
+                render: data => {
+                    if (!data) return '0';
+                    let total = data.reduce((sum, d) => sum + parseInt(d.jumlah || 0), 0);
+                    return '<strong>' + total.toLocaleString('id-ID') + '</strong>';
+                },
+                className: 'text-center'
             },
             { 
                 data: 'keterangan', 
-                name: 'keterangan', 
-                defaultContent: '<em class="text-muted">Tidak ada</em>',
-                render: function(data) {
-                    return data ? '<small>' + data.substring(0, 50) + (data.length > 50 ? '...' : '') + '</small>' : '<em class="text-muted">Tidak ada</em>';
-                }
+                render: data => data 
+                    ? '<small>' + data.substring(0,50) + (data.length > 50 ? '...' : '') + '</small>' 
+                    : '<em class="text-muted">Tidak ada</em>'
             },
             { data: 'user.name', name: 'user.name', defaultContent: '-' },
             { 
                 data: 'action', 
-                name: 'action', 
                 orderable: false, 
-                searchable: false,
+                searchable: false, 
                 className: 'text-center'
             }
         ],
         order: [[0, 'desc']],
         pageLength: 25,
+        lengthMenu: [10, 25, 50, 100],
         language: {
             processing: "Memuat data transaksi...",
             emptyTable: "Belum ada transaksi",
             zeroRecords: "Tidak ditemukan transaksi yang cocok",
-            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ transaksi"
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ transaksi",
+            paginate: {
+                previous: "Sebelumnya",
+                next: "Berikutnya"
+            }
         }
     });
 });

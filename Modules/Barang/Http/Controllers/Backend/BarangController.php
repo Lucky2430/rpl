@@ -3,10 +3,11 @@
 namespace Modules\Barang\Http\Controllers\Backend;
 
 use App\Http\Controllers\Backend\BackendBaseController;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Barang\Entities\Barang;
+use Modules\Gudang\Entities\Gudang;
+use Illuminate\Support\Str; // Added to support Str::limit
 
 class BarangController extends BackendBaseController
 {
@@ -34,9 +35,12 @@ class BarangController extends BackendBaseController
 
     public function datatable()
     {
-        $query = Barang::query();
+        $query = Barang::with('gudang'); // TAMBAH RELASI GUDANG
 
         return DataTables::of($query)
+            // Fixed: avoid PHP 8 null-safe operator (?->)
+            ->addColumn('gudang', fn($row) => optional($row->gudang)->nama_gudang ?? '-')
+            ->addColumn('harga_rp', fn($row) => 'Rp ' . number_format($row->harga, 0, ',', '.'))
             ->addColumn('action', function ($row) {
                 $btn  = '<div class="btn-group">';
                 $btn .= '<a href="'.route('backend.barang.edit', $row->id).'" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> ';
@@ -63,8 +67,11 @@ class BarangController extends BackendBaseController
         $module_icon  = $this->module_icon;
         $module_action = 'Create';
 
+        // KIRIM DATA GUDANG KE VIEW!
+        $gudangs = Gudang::active()->orderBy('nama_gudang')->get();
+
         return view("{$this->module_path}.barang.create", compact(
-            'module_title', 'module_name', 'module_icon', 'module_action'
+            'module_title', 'module_name', 'module_icon', 'module_action', 'gudangs'
         ));
     }
 
@@ -72,27 +79,39 @@ class BarangController extends BackendBaseController
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'satuan'      => 'required|string|max:50',
+            'gudang_id'   => 'required|exists:gudangs,id',
+            'stok'        => 'required|integer|min:0',
+            'harga'       => 'nullable|numeric|min:0',
             'keterangan'  => 'nullable|string',
             'is_active'   => 'boolean',
         ]);
 
-        Barang::create($request->only(['nama_barang', 'satuan', 'keterangan', 'is_active']));
+        Barang::create([
+            'nama_barang' => $request->nama_barang,
+            'gudang_id'   => $request->gudang_id,
+            'stok'        => $request->stok,
+            'harga'       => $request->harga ?? 0,
+            'keterangan'  => $request->keterangan,
+            'is_active'   => $request->has('is_active') ? 1 : 0,
+            // KODE OTOMATIS LANGSUNG DARI MODEL!
+        ]);
 
-        flash(icon()." Barang berhasil ditambahkan")->success()->important();
+        flash("Barang berhasil ditambahkan!")->success()->important();
         return redirect()->route('backend.barang.index');
     }
 
     public function edit($id)
     {
         $barang = Barang::findOrFail($id);
+        $gudangs = Gudang::active()->orderBy('nama_gudang')->get();
+
         $module_title = $this->module_title;
         $module_name  = $this->module_name;
         $module_icon  = $this->module_icon;
         $module_action = 'Edit';
 
         return view("{$this->module_path}.barang.edit", compact(
-            'module_title', 'module_name', 'module_icon', 'module_action', 'barang'
+            'module_title', 'module_name', 'module_icon', 'module_action', 'barang', 'gudangs'
         ));
     }
 
@@ -102,23 +121,30 @@ class BarangController extends BackendBaseController
 
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'satuan'      => 'required|string|max:50',
+            'gudang_id'   => 'required|exists:gudangs,id',
+            'stok'        => 'required|integer|min:0',
+            'harga'       => 'nullable|numeric|min:0',
             'keterangan'  => 'nullable|string',
             'is_active'   => 'boolean',
         ]);
 
-        $barang->update($request->only(['nama_barang', 'satuan', 'keterangan', 'is_active']));
+        $barang->update([
+            'nama_barang' => $request->nama_barang,
+            'gudang_id'   => $request->gudang_id,
+            'stok'        => $request->stok,
+            'harga'       => $request->harga ?? 0,
+            'keterangan'  => $request->keterangan,
+            'is_active'   => $request->has('is_active') ? 1 : 0,
+        ]);
 
-        flash(icon()." Barang berhasil diperbarui")->success()->important();
+        flash("Barang berhasil diperbarui!")->success()->important();
         return redirect()->route('backend.barang.index');
     }
 
     public function destroy($id)
     {
-        $barang = Barang::findOrFail($id);
-        $barang->delete();
-
-        flash(icon()." Barang berhasil dihapus")->success()->important();
+        Barang::findOrFail($id)->delete();
+        flash("Barang berhasil dihapus!")->success()->important();
         return redirect()->route('backend.barang.index');
     }
 }

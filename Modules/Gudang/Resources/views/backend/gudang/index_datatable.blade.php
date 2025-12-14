@@ -26,7 +26,11 @@
             <div class="col-4">
                 <div class="float-right">
                     <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}"/>
-                    {{-- <x-buttons.create route='{{ module_route("gudang.create") }}' title="Tambah Gudang" /> --}}
+                    {{-- <x-buttons.export route='{{ route("backend.$module_name.index") }}' title="{{__('Export')}} {{ ucwords(Str::singular($module_name)) }}"/> --}}
+
+                    <a href="{{ route('backend.gudang.export.csv') }}" class="btn btn-success btn-sm ml-2">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </a>
 
                     @if(config('modules.gudang.trashed_enabled', false))
                     <div class="btn-group" role="group">

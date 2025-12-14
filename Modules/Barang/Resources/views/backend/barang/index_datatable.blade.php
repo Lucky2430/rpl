@@ -38,7 +38,8 @@
                             <th width="5%">#</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
-                            <th>Satuan</th>
+                            <!-- CHANGED: rename Satuan -> Stok -->
+                            <th>Stok</th>
                             <th>Keterangan</th>
                             <th width="10%">Status</th>
                             <th width="12%" class="text-center">Aksi</th>
@@ -77,7 +78,8 @@ $(function () {
             { data: 'id', name: 'id', width: '5%', className: 'text-center' },
             { data: 'kode_barang', name: 'kode_barang' },
             { data: 'nama_barang', name: 'nama_barang' },
-            { data: 'satuan', name: 'satuan', defaultContent: 'pcs' },
+            // CHANGED: map to 'stok' instead of 'satuan'
+            { data: 'stok', name: 'stok', defaultContent: '0' },
             { 
                 data: 'keterangan', 
                 name: 'keterangan', 
@@ -89,10 +91,11 @@ $(function () {
             { 
                 data: 'is_active', 
                 name: 'is_active',
+                // CHANGED: labels -> Tersedia / Kosong
                 render: function(data) {
                     return data 
-                        ? '<span class="badge badge-success">Aktif</span>' 
-                        : '<span class="badge badge-danger">Non Aktif</span>';
+                        ? '<span class="badge badge-success">Tersedia</span>' 
+                        : '<span class="badge badge-danger">Kosong</span>';
                 }
             },
             { 

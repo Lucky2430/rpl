@@ -2,6 +2,7 @@
 
 namespace Modules\Gudang\Entities;
 
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -71,5 +72,15 @@ class Gudang extends Model
     public function transaksiDetails()
     {
         return $this->hasMany(\Modules\Transaksi\Entities\TransaksiDetail::class);
+    }
+
+    public function barangs()
+    {
+        return $this->hasMany(\Modules\Barang\Entities\Barang::class);
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany(\Modules\Transaksi\Entities\Transaksi::class);
     }
 }

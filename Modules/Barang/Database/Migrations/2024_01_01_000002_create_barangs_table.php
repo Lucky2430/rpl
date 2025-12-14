@@ -13,21 +13,19 @@ class CreateBarangsTable extends Migration
             $table->string('kode_barang')->unique();
             $table->string('nama_barang');
             
-            // KOLOM YANG HARUS ADA UNTUK SISTEM GUDANG
-            $table->integer('stok')->unsigned()->default(0);        // STOK SAAT INI
-            $table->decimal('harga_beli', 15, 2)->default(0);       // Optional: harga beli
-            $table->decimal('harga_jual', 15, 2)->default(0);       // Optional: harga jual
-            $table->string('satuan')->default('pcs');
+            // LANGSUNG TERKONEKSI KE GUDANG!
+            $table->foreignId('gudang_id')->constrained('gudangs')->onDelete('cascade');
+            
+            $table->integer('stok')->unsigned()->default(0);
+            $table->decimal('harga', 15, 2)->default(0);
             $table->text('keterangan')->nullable();
             $table->boolean('is_active')->default(true);
             
             $table->timestamps();
             $table->softDeletes();
 
-            // Index untuk performa
             $table->index('kode_barang');
-            $table->index('nama_barang');
-            $table->index('is_active');
+            $table->index('gudang_id');
         });
     }
 

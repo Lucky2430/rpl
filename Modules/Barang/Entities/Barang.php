@@ -4,6 +4,7 @@ namespace Modules\Barang\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Barang extends Model
 {
@@ -14,76 +15,40 @@ class Barang extends Model
     protected $fillable = [
         'kode_barang',
         'nama_barang',
-        'satuan',
+        'gudang_id',
+        'stok',
+        'harga',
         'keterangan',
         'is_active'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'stok'      => 'integer',
+        'harga'     => 'decimal:2'
     ];
 
-    // ================================================================================
-    // OTOMATIS GENERATE KODE BARANG: BRG-001, BRG-002, dst
-    // ================================================================================
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($barang) {
             if (empty($barang->kode_barang)) {
-                $barang->kode_barang = self::generateKodeBarang();
+                $last = self::withTrashed()->orderBy('id', 'desc')->first();
+                $number = $last ? $last->id + 1 : 1;
+                $barang->kode_barang = 'BRG-' . str_pad($number, 4, '0', STR_PAD_LEFT);
             }
         });
     }
 
-    public static function generateKodeBarang()
-    {
-        $prefix = 'BRG';
-        $last = self::withTrashed()
-                    ->where('kode_barang', 'like', $prefix . '%')
-                    ->orderBy('id', 'desc')  // GANTI JADI INI — LEBIH AMAN!
-                    ->first();
-
-        if (!$last) {
-            return $prefix . '-0001';
-        }
-
-        // Ambil angka dari kode terakhir
-        $number = (int) substr($last->kode_barang, 4); // setelah "BRG-"
-        $number++;
-
-        return $prefix . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-    }
-
-    // ================================================================================
-    // Scope aktif / nonaktif
-    // ================================================================================
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeInactive($query)
+    // RELASI KE GUDANG
+    public function gudang()
     {
-        return $query->where('is_active', false);
-    }
-
-    // ================================================================================
-    // Relasi ke Transaksi (opsional, buat laporan)
-    // ================================================================================
-    public function transaksiMasuk()
-    {
-        return $this->hasMany(\Modules\Transaksi\Entities\Transaksi::class)->where('jenis', 'masuk');
-    }
-
-    public function transaksiKeluar()
-    {
-        return $this->hasMany(\Modules\Transaksi\Entities\Transaksi::class)->where('jenis', 'keluar');
-    }
-
-    public function transaksiDetails()
-    {
-        return $this->hasMany(\Modules\Transaksi\Entities\TransaksiDetail::class);
+        return $this->belongsTo(\Modules\Gudang\Entities\Gudang::class);
     }
 }

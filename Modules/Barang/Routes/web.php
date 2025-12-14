@@ -1,46 +1,6 @@
 <?php
-
-/*
-*
-* Frontend Routes
-*
-* --------------------------------------------------------------------
-*/
-// Route::group(['namespace' => '\Modules\Tag\Http\Controllers\Frontend', 'as' => 'frontend.', 'middleware' => 'web', 'prefix' => ''], function () {
-
-//     /*
-//      *
-//      *  Tags Routes
-//      *
-//      * ---------------------------------------------------------------------
-//      */
-//     $module_name = 'tags';
-//     $controller_name = 'TagsController';
-//     Route::get("$module_name", ['as' => "$module_name.index", 'uses' => "$controller_name@index"]);
-//     Route::get("$module_name/{id}/{slug?}", ['as' => "$module_name.show", 'uses' => "$controller_name@show"]);
-// });
-
-/*
-*
-* Backend Routes
-*
-* --------------------------------------------------------------------
-*/
 Route::group(['namespace' => '\Modules\Barang\Http\Controllers\Backend', 'as' => 'backend.', 'middleware' => ['web', 'auth', 'can:view_backend'], 'prefix' => 'admin'], function () {
-    /*
-    * These routes need view-backend permission
-    * (good if you want to allow more than one group in the backend,
-    * then limit the backend features by different roles or permissions)
-    *
-    * Note: Administrator has all permissions so you do not have to specify the administrator role everywhere.
-    */
 
-    /*
-     *
-     *  Barang Routes
-     *
-     * ---------------------------------------------------------------------
-     */
     $module_name = 'barang';
     $controller_name = 'BarangController';
     Route::get("$module_name/datatable", ['as' => "$module_name.datatable", 'uses' => "$controller_name@datatable"]);
@@ -48,5 +8,6 @@ Route::group(['namespace' => '\Modules\Barang\Http\Controllers\Backend', 'as' =>
     Route::get("$module_name/index_data", ['as' => "$module_name.index_data", 'uses' => "$controller_name@index_data"]);
     Route::get("$module_name/trashed", ['as' => "$module_name.trashed", 'uses' => "$controller_name@trashed"]);
     Route::patch("$module_name/trashed/{id}", ['as' => "$module_name.restore", 'uses' => "$controller_name@restore"]);
+    Route::get('barang/get-gudang', [BarangController::class, 'getGudang'])->name('backend.barang.get-gudang');
     Route::resource("$module_name", "$controller_name");
 });
