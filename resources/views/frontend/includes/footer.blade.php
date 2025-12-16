@@ -12,7 +12,7 @@
                     A CMS like modular starter application project built with Laravel 7.
                 </p>
             </div>
-            <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0 text-center">
+            <!-- <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0 text-center">
                 <h6>
                     Pages
                 </h6>
@@ -22,8 +22,8 @@
                     <li><a target="_blank" href="#">Support</a></li>
                     <li><a target="_blank" href="#">Contact Us</a></li>
                 </ul>
-            </div>
-            <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0 text-center">
+            </div> -->
+            <!-- <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0 text-center">
                 <h6>
                     Account
                 </h6>
@@ -57,8 +57,8 @@
                     </li>
                     @endguest
                 </ul>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-4">
+            </div> -->
+            <!-- <div class="col-12 col-sm-6 col-lg-4">
                 <h6>Subscribe</h6>
                 <p class="font-small">The latest Impact news, articles, and resources, sent straight to your inbox every month.</p>
                 <form action="#">
@@ -72,7 +72,7 @@
                     </div>
                 </form>
                 <small class="mt-2 form-text">We’ll never share your details. See our <a href="{{route('frontend.privacy')}}" class="font-weight-bold text-underline">Privacy Policy</a></small>
-            </div>
+            </div> -->
         </div>
 
         <hr class="my-4 my-lg-5">

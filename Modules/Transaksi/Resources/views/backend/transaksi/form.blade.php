@@ -3,28 +3,6 @@
     <div class="col-12 col-md-4">
         <div class="form-group">
             <?php
-            $field_name = 'jenis';
-            $field_lable = 'Jenis Transaksi';
-            $required = "required";
-            $select_options = [
-                'masuk'  => 'Transaksi Masuk',
-                'keluar' => 'Transaksi Keluar'
-            ];
-            ?>
-            {{ html()->label($field_lable, $field_name)->class('font-weight-bold') }} {!! fielf_required($required) !!}
-            {{ html()->select($field_name, $select_options)
-                ->class('form-control')
-                ->attributes(["$required"])
-                ->value(old($field_name)) }}
-            @error($field_name)
-                <span class="text-danger small">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
-
-    <div class="col-12 col-md-4">
-        <div class="form-group">
-            <?php
             $field_name = 'tanggal';
             $field_lable = 'Tanggal Transaksi';
             $required = "required";

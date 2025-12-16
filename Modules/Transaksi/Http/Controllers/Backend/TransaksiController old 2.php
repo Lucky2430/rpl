@@ -31,11 +31,15 @@ class TransaksiController extends BackendBaseController
         $query = Transaksi::with(['user', 'details.barang.gudang']);
 
         return DataTables::of($query)
-            ->addIndexColumn()
+            ->addIndexColumn() // ini buat kolom #
+            ->addColumn('kode_transaksi', fn($row) => $row->kode_transaksi)
+            ->addColumn('total_item', fn($row) => $row->details->sum('jumlah'))
             ->addColumn('action', function ($row) {
-                return '<a href="'.route('backend.transaksi.show', $row->id).'" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>';
+                $btn = '<a href="'.route('backend.transaksi.show', $row->id).'" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>';
+                return $btn;
             })
-            ->rawColumns(['action'])
+            ->editColumn('jenis', fn($row) => $row->jenis == 'masuk' ? '<span class="badge badge-success">MASUK</span>' : '<span class="badge badge-danger">KELUAR</span>')
+            ->rawColumns(['action', 'jenis'])
             ->make(true);
     }
 
@@ -45,7 +49,7 @@ class TransaksiController extends BackendBaseController
         $module_name    = $this->module_name;
         $module_path    = $this->module_path;
         $module_icon    = $this->module_icon;
-        $module_action = 'Create'; 
+        $module_action = 'Create'; // INI YANG KURANG!
 
         return view("{$module_path}.transaksi.create", compact(
             'module_title',
@@ -59,6 +63,7 @@ class TransaksiController extends BackendBaseController
     public function store(Request $request)
     {
         $request->validate([
+            'jenis' => 'required|in:masuk,keluar',
             'tanggal' => 'required|date',
             'details' => 'required|array|min:1',
             'details.*.barang_id' => 'required|exists:barangs,id',
@@ -68,6 +73,7 @@ class TransaksiController extends BackendBaseController
         DB::beginTransaction();
         try {
             $transaksi = Transaksi::create([
+                'jenis' => $request->jenis,
                 'tanggal' => $request->tanggal,
                 'keterangan' => $request->keterangan,
                 'user_id' => auth()->id(),
